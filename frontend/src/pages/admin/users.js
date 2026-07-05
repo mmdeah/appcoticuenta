@@ -22,9 +22,12 @@ export async function renderAdminUsers() {
         <td>${u.email}</td>
         <td>${badge}</td>
         <td>
-          <button class="btn btn-outline btn-sm toggle-status" data-id="${u.id}" data-status="${u.status}">
-            ${u.status === 'active' ? 'Suspender' : 'Activar'}
-          </button>
+          <div class="table-actions">
+            <button class="btn btn-outline btn-sm toggle-status" data-id="${u.id}" data-status="${u.status}">
+              ${u.status === 'active' ? 'Suspender' : 'Activar'}
+            </button>
+            ${u.status === 'suspended' ? `<button class="btn btn-outline btn-sm archive-btn" data-id="${u.id}" style="color:var(--c-text-3)">Archivar</button>` : ''}
+          </div>
         </td>
       </tr>
     `;
@@ -72,6 +75,16 @@ export async function renderAdminUsers() {
       btn.disabled = true;
       await supabase.from('users').update({ status: newStatus }).eq('id', btn.dataset.id);
       toast('Estado actualizado', 'success');
+      renderAdminUsers();
+    });
+  });
+
+  document.querySelectorAll('.archive-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if(!confirm('¿Seguro que deseas archivar este usuario permanentemente? No aparecerá en esta lista.')) return;
+      btn.disabled = true;
+      await supabase.from('users').update({ status: 'archived' }).eq('id', btn.dataset.id);
+      toast('Usuario archivado', 'success');
       renderAdminUsers();
     });
   });

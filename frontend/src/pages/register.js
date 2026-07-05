@@ -21,7 +21,7 @@ export function renderRegister() {
               <input id="r-company" type="text" class="form-control" placeholder="Mi Empresa S.A.S." required />
             </div>
             <div class="form-group">
-              <label class="form-label" for="r-nit">NIT <span>*</span></label>
+              <label class="form-label" for="r-nit">NIT / CC <span>*</span></label>
               <input id="r-nit" type="text" class="form-control" placeholder="900123456-7" required />
             </div>
           </div>
