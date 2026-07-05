@@ -58,6 +58,7 @@ export async function renderDashboard() {
       <div class="main-content">
         ${renderTopBar('Dashboard')}
         <div class="page-content">
+          <p class="guide-text">Resumen de tu actividad. Usa los accesos rápidos para crear cotizaciones, cuentas de cobro o gestionar tus clientes.</p>
           ${subsAlert}
 
           <div class="kpi-grid">

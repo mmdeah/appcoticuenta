@@ -27,7 +27,8 @@ export async function renderSettings() {
           </div>
 
           <div class="card tab-content" id="tab-general">
-            <h3 style="margin-bottom:16px">Datos de la empresa</h3>
+            <h3 style="margin-bottom:4px">Datos de la empresa</h3>
+            <p class="guide-text">Esta información aparece en el encabezado de tus cotizaciones y cuentas de cobro.</p>
             <div class="form-row cols-2">
               <div class="form-group"><label class="form-label">Nombre</label><input id="s-name" class="form-control" value="${company?.name||''}" readonly /></div>
               <div class="form-group"><label class="form-label">NIT / Cédula</label><input id="s-nit" class="form-control" value="${company?.nit||''}" readonly /></div>
@@ -41,8 +42,10 @@ export async function renderSettings() {
             <div class="divider"></div>
             <h3 style="margin-bottom:16px">Identidad visual</h3>
             <div class="form-group">
-              <label class="form-label">Logotipo (URL)</label>
-              <input id="s-logo" class="form-control" value="${company?.logo_url||''}" placeholder="https://..." />
+              <label class="form-label">Logotipo (Archivo de imagen)</label>
+              <p class="form-hint" style="opacity:.7;margin-top:0;margin-bottom:6px">Sube una foto de tu logo (JPG o PNG). Se mostrará en tus documentos.</p>
+              <input type="file" id="s-logo-file" class="form-control" accept="image/*" />
+              <img id="s-logo-preview" src="${company?.logo_url||''}" style="max-height:80px; margin-top:10px; display:${company?.logo_url?'block':'none'}" />
             </div>
             <div class="form-row cols-2">
               <div class="form-group">
@@ -64,7 +67,8 @@ export async function renderSettings() {
           </div>
 
           <div class="card tab-content" id="tab-docs" style="display:none">
-            <h3 style="margin-bottom:16px">Opciones de Documentos</h3>
+            <h3 style="margin-bottom:4px">Opciones de Documentos</h3>
+            <p class="guide-text">Estos valores se usan por defecto al crear una nueva cotización o cuenta de cobro.</p>
             <div class="form-group" style="margin-bottom:24px">
               <div class="toggle-group" style="margin-bottom:12px">
                 <label class="toggle"><input type="checkbox" id="s-iva-en" ${conf.iva_enabled?'checked':''} /><span class="toggle-slider"></span></label>
@@ -84,15 +88,12 @@ export async function renderSettings() {
             <h3 style="margin-bottom:16px">Textos por defecto</h3>
             <div class="form-group"><label class="form-label">Condiciones comerciales</label><textarea id="s-terms" class="form-control">${conf.terms||''}</textarea></div>
             <div class="form-group"><label class="form-label">Garantía</label><textarea id="s-warr" class="form-control">${conf.warranty||''}</textarea></div>
-            <div class="form-row cols-2">
-              <div class="form-group"><label class="form-label">Forma de pago</label><input id="s-pay" class="form-control" value="${conf.paymode||''}" /></div>
-              <div class="form-group"><label class="form-label">Validez oferta</label><input id="s-val" class="form-control" value="${conf.validity||''}" /></div>
-            </div>
             <button class="btn btn-primary" id="btn-save-docs" style="margin-top:16px">Guardar Configuración</button>
           </div>
 
           <div class="card tab-content" id="tab-user" style="display:none">
-             <h3 style="margin-bottom:16px">Datos personales</h3>
+             <h3 style="margin-bottom:4px">Datos personales</h3>
+             <p class="guide-text">Información de tu perfil de usuario dentro de la empresa.</p>
              <div class="form-group"><label class="form-label">Nombre</label><input id="u-name" class="form-control" value="${profile.name||''}" /></div>
              <div class="form-group"><label class="form-label">Teléfono</label><input id="u-phone" class="form-control" value="${profile.phone||''}" /></div>
              <button class="btn btn-primary" id="btn-save-user" style="margin-top:16px">Actualizar perfil</button>
@@ -128,6 +129,25 @@ export async function renderSettings() {
   const ivaEn = document.getElementById('s-iva-en'), ivaBox = document.getElementById('s-iva-box');
   if(ivaEn) ivaEn.addEventListener('change', () => ivaBox.style.display = ivaEn.checked ? 'block' : 'none');
 
+  const logoFile = document.getElementById('s-logo-file');
+  const logoPreview = document.getElementById('s-logo-preview');
+  let currentLogo = company?.logo_url || '';
+
+  if (logoFile) {
+    logoFile.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          currentLogo = e.target.result;
+          logoPreview.src = currentLogo;
+          logoPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
   // Guardar General
   document.getElementById('btn-save-general').addEventListener('click', async () => {
     const btn = document.getElementById('btn-save-general');
@@ -137,7 +157,7 @@ export async function renderSettings() {
         address: document.getElementById('s-address').value,
         city:    document.getElementById('s-city').value,
         website: document.getElementById('s-website').value,
-        logo_url: document.getElementById('s-logo').value,
+        logo_url: currentLogo,
         primary_color: document.getElementById('s-c1').value,
         secondary_color: document.getElementById('s-c2').value
       }).eq('id', companyId);
@@ -157,9 +177,7 @@ export async function renderSettings() {
         next_quote:  document.getElementById('s-next-q').value,
         next_invoice:document.getElementById('s-next-i').value,
         terms:       document.getElementById('s-terms').value,
-        warranty:    document.getElementById('s-warr').value,
-        paymode:     document.getElementById('s-pay').value,
-        validity:    document.getElementById('s-val').value
+        warranty:    document.getElementById('s-warr').value
       };
       
       const { data: exist } = await supabase.from('company_config').select('company_id').eq('company_id', companyId).single();

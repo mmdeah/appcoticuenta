@@ -30,6 +30,7 @@ export async function renderSupport() {
       <div class="main-content">
         ${renderTopBar('Centro de Soporte', `<button class="btn btn-primary" id="btn-new-ticket">Nuevo Ticket</button>`)}
         <div class="page-content">
+          <p class="guide-text">Crea un ticket si tienes dudas o problemas. Nuestro equipo te responderá lo antes posible.</p>
           <div class="card" style="padding:0">
             <div class="table-wrap">
               <table class="table table-hover">

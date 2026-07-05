@@ -24,9 +24,12 @@ export async function renderWizard() {
     <div class="auth-page" style="background:#f1f5f9; align-items:flex-start; padding-top:60px;">
       <div class="card" style="max-width:600px; width:100%; padding:32px;">
         <div class="auth-logo" style="justify-content:center; margin-bottom:24px;">${LOGO} CotiCuenta</div>
-        <h2 style="text-align:center; margin-bottom:8px;">Configuración inicial</h2>
-        <p style="text-align:center; color:var(--c-text-2); margin-bottom:32px;">
-          Completa estos pasos para personalizar tus documentos.
+        <h2 style="text-align:center; margin-bottom:8px;">¡Bienvenido${profile.name ? ', ' + profile.name : ''}!</h2>
+        <p style="text-align:center; color:var(--c-text-2); margin-bottom:8px;">
+          Antes de continuar debes completar la configuración inicial de tu empresa.
+        </p>
+        <p class="guide-text" style="text-align:center">
+          Te guiaremos paso a paso. No podrás usar el resto de la plataforma hasta terminar estos 4 pasos.
         </p>
 
         <div class="wizard-steps">
@@ -45,6 +48,7 @@ export async function renderWizard() {
         </div>
 
         <div id="step-1" class="wizard-content">
+          <p class="guide-text">Estos datos aparecerán en el encabezado de tus cotizaciones y cuentas de cobro.</p>
           <div class="form-group"><label class="form-label">Dirección <span>*</span></label><input id="w-address" class="form-control" placeholder="Av. Principal #123" /></div>
           <div class="form-row cols-2">
             <div class="form-group"><label class="form-label">Ciudad <span>*</span></label><input id="w-city" class="form-control" placeholder="Bogotá" /></div>
@@ -53,9 +57,11 @@ export async function renderWizard() {
         </div>
 
         <div id="step-2" class="wizard-content" style="display:none">
+          <p class="guide-text">Personaliza la identidad visual de tus documentos con tu logo y tus colores de marca.</p>
           <div class="form-group">
-            <label class="form-label">Logotipo (URL) <span style="font-size:12px;font-weight:400;color:var(--c-text-3)">(Opcional)</span></label>
-            <input id="w-logo" class="form-control" placeholder="https://ejemplo.com/logo.png" />
+            <label class="form-label">Logotipo <span style="font-size:12px;font-weight:400;color:var(--c-text-3)">(Opcional)</span></label>
+            <input type="file" id="w-logo-file" class="form-control" accept="image/*" />
+            <img id="w-logo-preview" style="max-height:80px; margin-top:10px; display:none" />
           </div>
           <div class="form-row cols-2">
             <div class="form-group">
@@ -76,15 +82,13 @@ export async function renderWizard() {
         </div>
 
         <div id="step-3" class="wizard-content" style="display:none">
+          <p class="guide-text">Estos textos se incluirán por defecto en tus documentos (podrás editarlos en cada uno).</p>
           <div class="form-group"><label class="form-label">Condiciones comerciales</label><textarea id="w-terms" class="form-control" placeholder="Términos y condiciones..."></textarea></div>
           <div class="form-group"><label class="form-label">Garantía</label><textarea id="w-warranty" class="form-control" placeholder="Detalles de la garantía..."></textarea></div>
-          <div class="form-row cols-2">
-            <div class="form-group"><label class="form-label">Forma de pago</label><input id="w-paymode" class="form-control" placeholder="Ej: Contado, 50% anticipo" /></div>
-            <div class="form-group"><label class="form-label">Validez de oferta</label><input id="w-validity" class="form-control" placeholder="Ej: 15 días" /></div>
-          </div>
         </div>
 
         <div id="step-4" class="wizard-content" style="display:none">
+          <p class="guide-text">Define si aplicas IVA por defecto y desde qué número empiezan tus consecutivos.</p>
           <div class="form-group" style="margin-bottom:24px">
             <div class="toggle-group" style="margin-bottom:12px">
               <label class="toggle"><input type="checkbox" id="w-iva-btn" /><span class="toggle-slider"></span></label>
@@ -111,6 +115,23 @@ export async function renderWizard() {
       </div>
     </div>
   `;
+
+  // Logo (archivo)
+  let currentLogo = '';
+  const logoFile = document.getElementById('w-logo-file');
+  const logoPreview = document.getElementById('w-logo-preview');
+  logoFile.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        currentLogo = ev.target.result;
+        logoPreview.src = currentLogo;
+        logoPreview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   // Colores (UI)
   const c1 = document.getElementById('w-color1');
@@ -162,14 +183,11 @@ export async function renderWizard() {
     const address = document.getElementById('w-address').value;
     const city    = document.getElementById('w-city').value;
     const web     = document.getElementById('w-website').value;
-    const logo    = document.getElementById('w-logo').value;
     const col1    = c1.value;
     const col2    = c2.value;
 
     const terms   = document.getElementById('w-terms').value;
     const warr    = document.getElementById('w-warranty').value;
-    const pmode   = document.getElementById('w-paymode').value;
-    const valid   = document.getElementById('w-validity').value;
 
     const iva_enabled = ivaBtn.checked;
     const iva_pct     = document.getElementById('w-iva-val').value;
@@ -179,16 +197,16 @@ export async function renderWizard() {
     try {
       // Update companies
       await supabase.from('companies').update({
-        address, city, website: web, logo_url: logo, primary_color: col1, secondary_color: col2
+        address, city, website: web, logo_url: currentLogo, primary_color: col1, secondary_color: col2
       }).eq('id', companyId);
 
       // Create/Update company_config
       const { data: existConf } = await supabase.from('company_config').select('company_id').eq('company_id', companyId).single();
-      const payloadConfig = { 
-        iva_enabled, 
+      const payloadConfig = {
+        iva_enabled,
         iva_percent: iva_enabled ? iva_pct : 0,
         // Almacenamos textos legales en config para simplificar
-        terms, warranty: warr, paymode: pmode, validity: valid,
+        terms, warranty: warr,
         next_quote: next_q, next_invoice: next_i
       };
 

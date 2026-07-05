@@ -6,7 +6,6 @@ import { route, initRouter, navigate } from './lib/router.js';
 import { renderLogin }    from './pages/login.js';
 import { renderRegister } from './pages/register.js';
 import { renderPayment }  from './pages/payment.js';
-import { renderPending }  from './pages/pending.js';
 
 // Pages - Client
 import { renderDashboard }   from './pages/dashboard.js';
@@ -30,7 +29,6 @@ import { renderAdminTickets }   from './pages/admin/tickets.js';
 route('/login',     renderLogin);
 route('/register',  renderRegister);
 route('/payment',   renderPayment);
-route('/pending',   renderPending);
 
 // ─── Rutas del cliente ───────────────────────────────────────
 route('/dashboard',    renderDashboard);

@@ -35,6 +35,7 @@ export async function renderClients() {
       <div class="main-content">
         ${renderTopBar('Clientes', `<button class="btn btn-primary" id="btn-new-client">+ Nuevo cliente</button>`)}
         <div class="page-content">
+          <p class="guide-text">Aquí administras tus clientes registrados. Al crear una cotización o cuenta de cobro también puedes usar "Consumidor final" si no requieres un cliente específico.</p>
           <div class="search-bar">
             <div class="search-input-wrap">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

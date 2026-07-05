@@ -61,7 +61,7 @@ export async function renderPayment() {
         </div>
 
         <button id="done-btn" class="btn btn-outline btn-block" style="margin-bottom:12px;font-weight:600">
-          Listo, ya pagué (Ir al inicio)
+          Pago hecho, volver al login
         </button>
 
         <a href="https://wa.me/${whatsapp}?text=${waMsg}" target="_blank" class="btn btn-success btn-block btn-lg" id="wa-btn" style="background:#25d366;border-color:#25d366;margin-bottom:12px">

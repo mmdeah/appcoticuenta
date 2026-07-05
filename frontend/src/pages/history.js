@@ -36,6 +36,7 @@ export async function renderHistory() {
       <div class="main-content">
         ${renderTopBar('Historial de Documentos')}
         <div class="page-content">
+          <p class="guide-text">Aquí encontrarás todas las cotizaciones y cuentas de cobro que has generado.</p>
           <div class="card" style="padding:0">
             <div class="table-wrap">
               <table class="table">

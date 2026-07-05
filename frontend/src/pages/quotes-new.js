@@ -31,7 +31,7 @@ export async function renderQuoteNew(params) {
       <div class="main-content">
         ${renderTopBar('Nueva Cotización', `<div class="autosave-status"><div class="autosave-dot"></div> Borrador</div>`)}
         <div class="page-content" style="background:#f8fafc">
-          
+          <p class="guide-text">Completa los datos, agrega tus ítems y revisa la vista previa a la derecha antes de guardar.</p>
           <div class="builder-layout">
             <div class="builder-form">
               <!-- Detalles base -->
@@ -41,8 +41,10 @@ export async function renderQuoteNew(params) {
                     <label class="form-label">Cliente</label>
                     <select class="form-control" id="q-client">
                       <option value="">-- Seleccionar --</option>
+                      <option value="__final__">Consumidor final</option>
                       ${(clients||[]).map(c=>`<option value="${c.id}">${c.name} ${c.company?`(${c.company})`:''}</option>`).join('')}
                     </select>
+                    <p class="form-hint" style="opacity:.7">Usa "Consumidor final" si el documento no es para un cliente específico registrado.</p>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Fecha de emisión</label>
@@ -53,7 +55,8 @@ export async function renderQuoteNew(params) {
 
               <!-- Items -->
               <div class="card" style="padding:16px">
-                <h4 style="margin-bottom:12px;font-size:14px">Ítems</h4>
+                <h4 style="margin-bottom:4px;font-size:14px">Ítems</h4>
+                <p class="form-hint" style="opacity:.7;margin-bottom:12px">El valor unitario se formatea automáticamente en pesos colombianos (COP).</p>
                 <div class="items-table" style="margin-bottom:12px">
                   <div class="item-row item-row-header">
                     <div>Descripción</div><div>Cant.</div><div>Valor Unit.</div><div>Total</div><div></div>
@@ -68,8 +71,8 @@ export async function renderQuoteNew(params) {
                 <div class="form-group"><label class="form-label">Condiciones comerciales</label><textarea id="q-terms" class="form-control" style="min-height:60px">${conf.terms||''}</textarea></div>
                 <div class="form-group"><label class="form-label">Garantía</label><textarea id="q-warr" class="form-control" style="min-height:60px">${conf.warranty||''}</textarea></div>
                 <div class="form-row cols-2">
-                  <div class="form-group"><label class="form-label">Forma de pago</label><input id="q-pay" class="form-control" value="${conf.paymode||''}" /></div>
-                  <div class="form-group"><label class="form-label">Validez</label><input id="q-val" class="form-control" value="${conf.validity||''}" /></div>
+                  <div class="form-group"><label class="form-label">Forma de pago</label><input id="q-pay" class="form-control" placeholder="Ej: Contado, 50% anticipo" /></div>
+                  <div class="form-group"><label class="form-label">Validez</label><input id="q-val" class="form-control" placeholder="Ej: 15 días" /></div>
                 </div>
               </div>
             </div>
@@ -101,13 +104,15 @@ export async function renderQuoteNew(params) {
 
   const container = document.getElementById('items-container');
 
+  function formatCOP(n) { return Number(n || 0).toLocaleString('es-CO'); }
+
   function renderItems() {
     container.innerHTML = items.map((it, i) => `
       <div class="item-row">
         <input type="text" class="form-control item-desc" data-i="${i}" value="${it.desc}" placeholder="Producto/Servicio..." />
         <input type="number" class="form-control item-qty" data-i="${i}" value="${it.qty}" min="1" />
-        <input type="number" class="form-control item-price" data-i="${i}" value="${it.price}" min="0" step="1000" />
-        <div style="font-weight:600;font-size:13px;text-align:right">$${(it.qty * it.price).toLocaleString('es-CO')}</div>
+        <input type="text" inputmode="numeric" class="form-control item-price" data-i="${i}" value="${formatCOP(it.price)}" placeholder="$ 0" />
+        <div class="item-row-total" style="font-weight:600;font-size:13px;text-align:right">$${formatCOP(it.qty * it.price)}</div>
         <button class="item-btn-remove" data-i="${i}">×</button>
       </div>
     `).join('');
@@ -115,7 +120,16 @@ export async function renderQuoteNew(params) {
     // Bind events
     container.querySelectorAll('.item-desc').forEach(el => el.addEventListener('input', e => { items[e.target.dataset.i].desc = e.target.value; updateTotals(); }));
     container.querySelectorAll('.item-qty').forEach(el => el.addEventListener('input', e => { items[e.target.dataset.i].qty = Number(e.target.value); renderItems(); }));
-    container.querySelectorAll('.item-price').forEach(el => el.addEventListener('input', e => { items[e.target.dataset.i].price = Number(e.target.value); renderItems(); }));
+    container.querySelectorAll('.item-price').forEach(el => el.addEventListener('input', e => {
+      const i = e.target.dataset.i;
+      const digits = e.target.value.replace(/\D/g, '');
+      const value = digits ? parseInt(digits, 10) : 0;
+      items[i].price = value;
+      e.target.value = formatCOP(value);
+      const row = e.target.closest('.item-row');
+      row.querySelector('.item-row-total').textContent = '$' + formatCOP(items[i].qty * value);
+      updateTotals();
+    }));
     container.querySelectorAll('.item-btn-remove').forEach(el => el.addEventListener('click', e => {
       if(items.length===1)return;
       items.splice(e.target.dataset.i, 1);
@@ -130,54 +144,66 @@ export async function renderQuoteNew(params) {
     const iva = sub * (ivaPct / 100);
     const total = sub + iva;
 
-    document.getElementById('p-sub').textContent = '$' + sub.toLocaleString('es-CO');
-    if(conf.iva_enabled) document.getElementById('p-iva').textContent = '$' + iva.toLocaleString('es-CO');
-    document.getElementById('p-total').textContent = '$' + total.toLocaleString('es-CO');
+    document.getElementById('p-sub').textContent = '$' + formatCOP(sub);
+    if(conf.iva_enabled) document.getElementById('p-iva').textContent = '$' + formatCOP(iva);
+    document.getElementById('p-total').textContent = '$' + formatCOP(total);
   }
 
   document.getElementById('btn-add-item').addEventListener('click', () => { items.push({desc:'',qty:1,price:0}); renderItems(); });
-  
+
   renderItems();
+
+  // Resuelve el cliente "Consumidor final" a un registro real (lo crea si aún no existe)
+  async function resolveClientId(cid) {
+    if (cid !== '__final__') return cid;
+    const { data: existing } = await supabase.from('clients').select('id').eq('company_id', companyId).eq('name', 'Consumidor Final').maybeSingle();
+    if (existing) return existing.id;
+    const { data: created, error } = await supabase.from('clients').insert({ name: 'Consumidor Final', company_id: companyId }).select().single();
+    if (error) throw error;
+    return created.id;
+  }
 
   // Guardar DB
   document.getElementById('btn-save').addEventListener('click', async () => {
-    const cid = document.getElementById('q-client').value;
-    if(!cid){ toast('Selecciona un cliente','error'); return; }
-    
+    const cidRaw = document.getElementById('q-client').value;
+    if(!cidRaw){ toast('Selecciona un cliente','error'); return; }
+
     // Check empty items
     if(items.some(x=>!x.desc)){ toast('Completa la descripción de los ítems','error'); return; }
 
     const btn = document.getElementById('btn-save');
     btn.disabled=true; btn.textContent='Guardando...';
 
-    const sub = items.reduce((acc, it) => acc + (it.qty * it.price), 0);
-    const ivaPct = conf.iva_enabled ? (conf.iva_percent || 0) : 0;
-    const iva = sub * (ivaPct / 100);
-    const total = sub + iva;
-
-    const payload = {
-      company_id: companyId,
-      client_id: cid,
-      type: 'quote',
-      number: qNum,
-      issue_date: document.getElementById('q-date').value,
-      subtotal: sub,
-      tax_total: iva,
-      grand_total: total,
-      items: items,
-      terms: document.getElementById('q-terms').value,
-      warranty: document.getElementById('q-warr').value,
-      payment_mode: document.getElementById('q-pay').value,
-      validity: document.getElementById('q-val').value,
-    };
-
     try {
+      const cid = await resolveClientId(cidRaw);
+
+      const sub = items.reduce((acc, it) => acc + (it.qty * it.price), 0);
+      const ivaPct = conf.iva_enabled ? (conf.iva_percent || 0) : 0;
+      const iva = sub * (ivaPct / 100);
+      const total = sub + iva;
+
+      const payload = {
+        company_id: companyId,
+        client_id: cid,
+        type: 'quote',
+        number: qNum,
+        issue_date: document.getElementById('q-date').value,
+        subtotal: sub,
+        tax_total: iva,
+        grand_total: total,
+        items: items,
+        terms: document.getElementById('q-terms').value,
+        warranty: document.getElementById('q-warr').value,
+        payment_mode: document.getElementById('q-pay').value,
+        validity: document.getElementById('q-val').value,
+      };
+
       const { error } = await supabase.from('documents').insert(payload);
       if(error) throw error;
-      
+
       // Incrementar consecutivo
       await supabase.from('company_config').update({ next_quote: qNum + 1 }).eq('company_id', companyId);
-      
+
       toast('Cotización guardada','success');
       navigate('/history');
     } catch(err) {

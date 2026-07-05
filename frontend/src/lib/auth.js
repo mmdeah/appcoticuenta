@@ -62,13 +62,16 @@ export async function requireAuth(requiredRole) {
     window.location.hash = '/login';
     return null;
   }
-  // Verificar que la cuenta esté activa
-  if (profile.status === 'pending') {
-    window.location.hash = '/pending';
+  // Verificar que la cuenta esté activa (pending/suspended no pueden usar la app)
+  if (profile.status === 'pending' || profile.status === 'suspended') {
+    await logout();
+    window.location.hash = '/login';
     return null;
   }
-  if (profile.status === 'suspended') {
-    window.location.hash = '/suspended';
+  // Primer ingreso: obligar a completar la configuración inicial antes de usar la app
+  const currentPath = window.location.hash.replace('#', '');
+  if (profile.role === 'client' && !profile?.companies?.address && currentPath !== '/wizard') {
+    window.location.hash = '/wizard';
     return null;
   }
   return { session, profile };
