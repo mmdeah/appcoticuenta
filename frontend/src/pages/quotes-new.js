@@ -71,8 +71,8 @@ export async function renderQuoteNew(params) {
 
               <!-- Textos -->
               <div class="card">
-                <div class="form-group"><label class="form-label">Condiciones comerciales</label><textarea id="q-terms" class="form-control" style="min-height:60px">${conf.terms||''}</textarea></div>
-                <div class="form-group"><label class="form-label">Garantía</label><textarea id="q-warr" class="form-control" style="min-height:60px">${conf.warranty||''}</textarea></div>
+                <div class="form-group"><label class="form-label">Condiciones comerciales</label><textarea id="q-terms" class="form-control">${conf.terms||''}</textarea></div>
+                <div class="form-group"><label class="form-label">Garantía</label><textarea id="q-warr" class="form-control">${conf.warranty||''}</textarea></div>
                 <div class="form-row cols-2">
                   <div class="form-group"><label class="form-label">Forma de pago</label><input id="q-pay" class="form-control" placeholder="Ej: Contado, 50% anticipo" /></div>
                   <div class="form-group"><label class="form-label">Validez</label><input id="q-val" class="form-control" placeholder="Ej: 15 días" /></div>

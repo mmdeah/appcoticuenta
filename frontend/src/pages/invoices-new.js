@@ -67,7 +67,7 @@ export async function renderInvoiceNew() {
 
               <div class="card">
                 <p class="form-hint" style="opacity:.7">Este texto aparecerá al final de la cuenta de cobro (datos de pago, instrucciones, etc.).</p>
-                <div class="form-group"><label class="form-label">Notas Adicionales</label><textarea id="i-terms" class="form-control" style="min-height:60px" placeholder="Ej: Datos de la cuenta para el pago, instrucciones adicionales..."></textarea></div>
+                <div class="form-group"><label class="form-label">Notas Adicionales</label><textarea id="i-terms" class="form-control" placeholder="Ej: Datos de la cuenta para el pago, instrucciones adicionales..."></textarea></div>
               </div>
             </div>
 

@@ -770,6 +770,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   .builder-preview { position: static; }
   .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
   .item-row { grid-template-columns: 1fr 60px 80px 70px 30px; }
+  .btn { white-space: normal; text-align: center; }
+  .modal-footer, .top-bar-right, .card-header, .table-actions { flex-wrap: wrap; }
 }
 @media (max-width: 560px) {
   .auth-card { padding: 28px 20px; }
