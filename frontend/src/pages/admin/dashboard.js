@@ -129,6 +129,9 @@ async function approveUser(userId) {
   const today  = new Date().toISOString().split('T')[0];
   const expiry = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
 
+  const { data: config } = await supabase.from('admin_config').select('plan_price').single();
+  const amount = parsePlanPrice(config?.plan_price);
+
   const { error } = await supabase.from('users').update({ status: 'active' }).eq('id', userId);
   if (error) { alert('Error al aprobar'); return; }
 
@@ -136,12 +139,17 @@ async function approveUser(userId) {
   const { data: user } = await supabase.from('users').select('company_id').eq('id', userId).single();
   if (user?.company_id) {
     await supabase.from('payments')
-      .update({ status: 'active', activation_date: today, expiry_date: expiry, last_payment_date: today })
+      .update({ status: 'active', activation_date: today, expiry_date: expiry, last_payment_date: today, amount })
       .eq('company_id', user.company_id)
       .eq('status', 'pending');
   }
 
   renderAdminDashboard();
+}
+
+function parsePlanPrice(priceStr) {
+  const digits = String(priceStr || '').replace(/\D/g, '');
+  return digits ? parseInt(digits, 10) : 0;
 }
 
 function kpiCard(label, value, bg, iconSvg) {

@@ -54,14 +54,17 @@ export async function renderAdminRequests() {
       if(!confirm('¿Aprobar este cliente y activar su suscripción?')) return;
       btn.disabled = true;
       const uid = btn.dataset.id;
-      
+
       const today  = new Date().toISOString().split('T')[0];
       const expiry = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+
+      const { data: config } = await supabase.from('admin_config').select('plan_price').single();
+      const amount = parsePlanPrice(config?.plan_price);
 
       await supabase.from('users').update({ status: 'active' }).eq('id', uid);
       const { data: user } = await supabase.from('users').select('company_id').eq('id', uid).single();
       if (user?.company_id) {
-        await supabase.from('payments').update({ status: 'active', activation_date: today, expiry_date: expiry, last_payment_date: today }).eq('company_id', user.company_id).eq('status', 'pending');
+        await supabase.from('payments').update({ status: 'active', activation_date: today, expiry_date: expiry, last_payment_date: today, amount }).eq('company_id', user.company_id).eq('status', 'pending');
       }
       toast('Cliente aprobado','success');
       renderAdminRequests();
@@ -76,4 +79,9 @@ export async function renderAdminRequests() {
       renderAdminRequests();
     });
   });
+}
+
+function parsePlanPrice(priceStr) {
+  const digits = String(priceStr || '').replace(/\D/g, '');
+  return digits ? parseInt(digits, 10) : 0;
 }
