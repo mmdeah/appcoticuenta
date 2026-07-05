@@ -27,6 +27,7 @@ export async function renderAdminUsers() {
               ${u.status === 'active' ? 'Suspender' : 'Activar'}
             </button>
             ${u.status === 'suspended' ? `<button class="btn btn-outline btn-sm archive-btn" data-id="${u.id}" style="color:var(--c-text-3)">Archivar</button>` : ''}
+            <button class="btn btn-danger btn-sm delete-user-btn" data-id="${u.id}">Eliminar</button>
           </div>
         </td>
       </tr>
@@ -87,6 +88,17 @@ export async function renderAdminUsers() {
       btn.disabled = true;
       await supabase.from('users').update({ status: 'archived' }).eq('id', btn.dataset.id);
       toast('Usuario archivado', 'success');
+      renderAdminUsers();
+    });
+  });
+
+  document.querySelectorAll('.delete-user-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if(!confirm('¿Eliminar este usuario permanentemente de la aplicación? Esta acción no se puede deshacer.')) return;
+      btn.disabled = true;
+      const { error } = await supabase.from('users').delete().eq('id', btn.dataset.id);
+      if (error) { toast('Error al eliminar. Revisa la consola.', 'error'); console.error(error); btn.disabled = false; return; }
+      toast('Usuario eliminado', 'success');
       renderAdminUsers();
     });
   });

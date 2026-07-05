@@ -12,7 +12,7 @@ export async function renderDashboard() {
   // Obtener datos resumidos
   const companyId = profile.company_id;
   const [{ count: clientCount }, { count: quoteCount }, { count: invoiceCount }, { count: ticketCount }] = await Promise.all([
-    supabase.from('clients').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
+    supabase.from('clients').select('*', { count: 'exact', head: true }).eq('company_id', companyId).neq('name', 'Consumidor Final'),
     supabase.from('documents').select('*', { count: 'exact', head: true }).eq('company_id', companyId).eq('type', 'quote'),
     supabase.from('documents').select('*', { count: 'exact', head: true }).eq('company_id', companyId).eq('type', 'invoice'),
     supabase.from('tickets').select('*', { count: 'exact', head: true }).eq('company_id', companyId).eq('status', 'open'),

@@ -43,7 +43,7 @@ export async function renderQuoteNew(params) {
                     <select class="form-control" id="q-client">
                       <option value="">-- Seleccionar --</option>
                       <option value="__final__">Consumidor final</option>
-                      ${(clients||[]).map(c=>`<option value="${c.id}">${c.name} ${c.company?`(${c.company})`:''}</option>`).join('')}
+                      ${(clients||[]).filter(c=>c.name!=='Consumidor Final').map(c=>`<option value="${c.id}">${c.name} ${c.company?`(${c.company})`:''}</option>`).join('')}
                     </select>
                     <p class="form-hint" style="opacity:.7">Usa "Consumidor final" si el documento no es para un cliente específico registrado.</p>
                   </div>

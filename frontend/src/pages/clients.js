@@ -11,7 +11,7 @@ export async function renderClients() {
   const { profile } = auth;
   const companyId = profile.company_id;
 
-  const { data: clients } = await supabase.from('clients').select('*').eq('company_id', companyId).order('name');
+  const { data: clients } = await supabase.from('clients').select('*').eq('company_id', companyId).neq('name', 'Consumidor Final').order('name');
 
   const rows = (clients || []).map(c => `
     <tr>
