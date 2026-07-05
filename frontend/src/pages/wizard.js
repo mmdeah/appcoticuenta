@@ -29,7 +29,7 @@ export async function renderWizard() {
           Antes de continuar debes completar la configuración inicial de tu empresa.
         </p>
         <p class="guide-text" style="text-align:center">
-          Tranquilo, no necesitas experiencia previa: te explicamos para qué sirve cada campo. Son solo 4 pasos cortos y no podrás usar el resto de la plataforma hasta terminarlos.
+          Tranquilo, no necesitas experiencia previa: te explicamos para qué sirve cada campo. Son solo 3 pasos cortos y no podrás usar el resto de la plataforma hasta terminarlos.
         </p>
 
         <div class="wizard-steps">
@@ -40,10 +40,7 @@ export async function renderWizard() {
             <div class="wizard-step-num">2</div><div class="wizard-step-label">Identidad</div>
           </div>
           <div class="wizard-step" id="step-3-marker">
-            <div class="wizard-step-num">3</div><div class="wizard-step-label">Legal</div>
-          </div>
-          <div class="wizard-step" id="step-4-marker">
-            <div class="wizard-step-num">4</div><div class="wizard-step-label">Opciones</div>
+            <div class="wizard-step-num">3</div><div class="wizard-step-label">Opciones</div>
           </div>
         </div>
 
@@ -97,20 +94,6 @@ export async function renderWizard() {
         </div>
 
         <div id="step-3" class="wizard-content" style="display:none">
-          <p class="guide-text">Ya dejamos un texto genérico para que no tengas que empezar de cero. Puedes usarlo tal cual, editarlo a tu gusto, o incluso cambiarlo cada vez que hagas una cotización o cuenta de cobro.</p>
-          <div class="form-group">
-            <label class="form-label">Condiciones comerciales</label>
-            <textarea id="w-terms" class="form-control">Los precios incluidos en este documento pueden estar sujetos a cambios sin previo aviso. Cualquier trabajo, producto o servicio adicional no contemplado aquí será cotizado por separado. El cliente se compromete a suministrar la información y los recursos necesarios para la correcta prestación del servicio.</textarea>
-            <p class="form-hint" style="opacity:.7">Son las reglas del juego con tu cliente: qué incluye el precio, qué pasa si piden cambios, etc. Aparecerá al final de tus documentos.</p>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Garantía</label>
-            <textarea id="w-warranty" class="form-control">Este producto o servicio cuenta con una garantía de 30 días a partir de la fecha de entrega, la cual cubre defectos de fabricación o instalación. No cubre daños ocasionados por mal uso.</textarea>
-            <p class="form-hint" style="opacity:.7">Cuánto tiempo respondes si algo sale mal después de entregar tu producto o servicio. Por defecto dejamos 30 días, puedes cambiarlo.</p>
-          </div>
-        </div>
-
-        <div id="step-4" class="wizard-content" style="display:none">
           <p class="guide-text">Estas opciones controlan cómo se calculan y numeran automáticamente tus documentos. Si no estás seguro, puedes dejarlas como están y ajustarlas después en Configuración.</p>
           <div class="form-group" style="margin-bottom:24px">
             <div class="toggle-group" style="margin-bottom:12px">
@@ -185,7 +168,7 @@ export async function renderWizard() {
   const btnNext = document.getElementById('w-next');
 
   function updateSteps() {
-    [1,2,3,4].forEach(i => {
+    [1,2,3].forEach(i => {
       document.getElementById(`step-${i}`).style.display = (i === currentStep) ? 'block' : 'none';
       const marker = document.getElementById(`step-${i}-marker`);
       marker.classList.remove('active', 'done');
@@ -193,7 +176,7 @@ export async function renderWizard() {
       else if (i === currentStep) marker.classList.add('active');
     });
     btnPrev.style.visibility = currentStep > 1 ? 'visible' : 'hidden';
-    btnNext.textContent = currentStep === 4 ? 'Finalizar' : 'Siguiente';
+    btnNext.textContent = currentStep === 3 ? 'Finalizar' : 'Siguiente';
   }
 
   btnPrev.addEventListener('click', () => { if (currentStep > 1) { currentStep--; updateSteps(); } });
@@ -206,7 +189,7 @@ export async function renderWizard() {
       }
     }
     
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       currentStep++; updateSteps(); return;
     }
 
@@ -218,9 +201,6 @@ export async function renderWizard() {
     const web     = document.getElementById('w-website').value;
     const col1    = c1.value;
     const col2    = c2.value;
-
-    const terms   = document.getElementById('w-terms').value;
-    const warr    = document.getElementById('w-warranty').value;
 
     const iva_enabled = ivaBtn.checked;
     const iva_pct     = document.getElementById('w-iva-val').value;
@@ -238,8 +218,6 @@ export async function renderWizard() {
       const payloadConfig = {
         iva_enabled,
         iva_percent: iva_enabled ? iva_pct : 0,
-        // Almacenamos textos legales en config para simplificar
-        terms, warranty: warr,
         next_quote: next_q, next_invoice: next_i
       };
 
