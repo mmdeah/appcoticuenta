@@ -30,7 +30,6 @@ function buildDocumentHTML(data) {
   const accent     = company?.primary_color   || '#1e293b';
   const accent2    = company?.secondary_color || '#3b82f6';
   const accentTint = tint(accent, 0.045);
-  const accent2Soft = tint(accent2, 0.10);
   const logo = company?.logo_url
     ? `<img src="${company.logo_url}" crossorigin="anonymous" style="max-height:60px;max-width:190px;object-fit:contain;display:block;margin-bottom:12px" />`
     : '';
@@ -63,16 +62,17 @@ function buildDocumentHTML(data) {
   return `
     <div style="font-family:'Inter','Helvetica Neue',Arial,sans-serif;width:740px;color:#1e293b;background:#ffffff;-webkit-font-smoothing:antialiased">
 
-      <!-- Franja superior de marca -->
-      <div style="height:10px;background:linear-gradient(90deg, ${accent}, ${accent2})"></div>
+      <!-- Franja superior de marca: dos bloques planos, sin degradado -->
+      <div style="height:4px;background:${accent2}"></div>
+      <div style="height:6px;background:${accent}"></div>
 
       <div style="padding:40px 46px 0">
 
         <!-- ═══ ENCABEZADO ═══ -->
-        <div style="display:flex;justify-content:space-between;align-items:stretch;gap:24px;margin-bottom:30px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:32px">
 
           <!-- Identidad de la empresa -->
-          <div style="max-width:340px;padding-top:2px">
+          <div style="max-width:340px">
             ${logo}
             <div style="font-size:20px;font-weight:800;color:${accent};line-height:1.3;letter-spacing:-.01em">${esc(company?.name) || 'Mi Empresa'}</div>
             <div style="margin-top:6px">
@@ -81,28 +81,28 @@ function buildDocumentHTML(data) {
             ${companyContact ? `<div style="font-size:11.5px;color:${accent};font-weight:600;line-height:1.65;margin-top:6px">${esc(companyContact)}</div>` : ''}
           </div>
 
-          <!-- Tarjeta de tipo de documento -->
-          <div style="background:${accent2Soft};border-radius:14px;padding:20px 26px;min-width:220px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center">
-            <div style="display:inline-flex;align-items:center;justify-content:center;height:26px;background:${accent};color:#ffffff;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1;padding:0 16px;border-radius:20px;white-space:nowrap">${typeLabel}</div>
-            <div style="font-size:26px;font-weight:800;line-height:1.3;margin-top:14px;color:#0f172a;letter-spacing:-.01em;white-space:nowrap">${prefix}-${String(number).padStart(4, '0')}</div>
-            <div style="width:100%;height:1px;background:${tint(accent2, 0.25)};margin:14px 0 12px"></div>
-            <div style="font-size:9.5px;color:#64748b;line-height:1.5;text-transform:uppercase;letter-spacing:.06em">Fecha de emisión</div>
-            <div style="font-size:13px;font-weight:700;line-height:1.5;color:#334155">${dateStr}</div>
+          <!-- Tipo de documento: texto plano, sin caja de fondo -->
+          <div style="text-align:right;padding-top:2px">
+            <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${accent};line-height:1.3">${typeLabel}</div>
+            <div style="font-size:26px;font-weight:800;line-height:1.3;margin-top:8px;color:#0f172a;letter-spacing:-.01em;white-space:nowrap">${prefix}-${String(number).padStart(4, '0')}</div>
+            <div style="width:64px;height:3px;background:${accent2};margin:12px 0 12px;margin-left:auto"></div>
+            <div style="font-size:9.5px;color:#94a3b8;line-height:1.5;text-transform:uppercase;letter-spacing:.06em">Fecha de emisión</div>
+            <div style="font-size:12.5px;font-weight:700;line-height:1.5;color:#334155">${dateStr}</div>
           </div>
         </div>
 
         <!-- ═══ CLIENTE + DETALLES ═══ -->
-        <div style="display:flex;gap:16px;margin-bottom:30px;align-items:stretch">
-          <div style="flex:${metaRows.length ? '1.4' : '1'};background:${accentTint};border:1px solid ${tint(accent, 0.12)};border-radius:12px;padding:18px 22px">
-            <div style="font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${accent};line-height:1.4;margin-bottom:8px">Cotizado / Facturado a</div>
+        <div style="display:flex;gap:32px;margin-bottom:32px">
+          <div style="flex:${metaRows.length ? '1.4' : '1'};border-left:3px solid ${accent};padding-left:16px">
+            <div style="font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;line-height:1.4;margin-bottom:6px">Cotizado / Facturado a</div>
             <div style="font-size:15px;font-weight:800;line-height:1.4;color:#0f172a">${esc(client?.name) || 'Consumidor Final'}${client?.company ? ` <span style="font-weight:500;color:#64748b">— ${esc(client.company)}</span>` : ''}</div>
             <div style="margin-top:4px">
               ${clientLines.map(l => `<div style="font-size:12px;color:#475569;line-height:1.7">${esc(l)}</div>`).join('')}
             </div>
           </div>
           ${metaRows.length ? `
-          <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px">
-            <div style="font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;line-height:1.4;margin-bottom:10px">Detalles</div>
+          <div style="flex:1;border-left:3px solid #e2e8f0;padding-left:16px">
+            <div style="font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;line-height:1.4;margin-bottom:6px">Detalles</div>
             ${metaRows.map((r, i) => `
               <div style="${i > 0 ? 'margin-top:10px' : ''}">
                 <div style="font-size:10px;color:#94a3b8;line-height:1.5">${esc(r.label)}</div>
@@ -116,11 +116,11 @@ function buildDocumentHTML(data) {
         <table style="width:100%;border-collapse:collapse;margin-bottom:4px">
           <thead>
             <tr>
-              <th style="text-align:center;vertical-align:middle;padding:12px 8px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent};width:34px;border-radius:8px 0 0 0">#</th>
+              <th style="text-align:center;vertical-align:middle;padding:12px 8px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent};width:34px">#</th>
               <th style="text-align:left;vertical-align:middle;padding:12px 10px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent}">Descripción</th>
               <th style="text-align:center;vertical-align:middle;padding:12px 10px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent};width:56px">Cant.</th>
               <th style="text-align:right;vertical-align:middle;padding:12px 10px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent};width:112px">Valor Unit.</th>
-              <th style="text-align:right;vertical-align:middle;padding:12px 14px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent};width:112px;border-radius:0 8px 0 0">Total</th>
+              <th style="text-align:right;vertical-align:middle;padding:12px 14px;font-size:10px;line-height:1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff;background:${accent};width:112px">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -136,19 +136,19 @@ function buildDocumentHTML(data) {
           </tbody>
         </table>
 
-        <!-- ═══ TOTALES ═══ -->
+        <!-- ═══ TOTALES: plano, sin caja de fondo, acento con color de marca ═══ -->
         <div style="display:flex;justify-content:flex-end;margin-top:18px;margin-bottom:32px">
           <div style="width:300px">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;font-size:12.5px;line-height:1.4;color:#64748b">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 4px;font-size:12.5px;line-height:1.4;color:#64748b">
               <span>Subtotal</span><span style="font-weight:600;color:#334155">${fmt(subtotal)}</span>
             </div>
             ${taxPercent ? `
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;font-size:12.5px;line-height:1.4;color:#64748b">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 4px;font-size:12.5px;line-height:1.4;color:#64748b">
               <span>IVA (${taxPercent}%)</span><span style="font-weight:600;color:#334155">${fmt(tax)}</span>
             </div>` : ''}
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;margin-top:10px;background:linear-gradient(90deg, ${accent}, ${accent2});color:#ffffff;border-radius:12px">
-              <span style="font-size:13.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1">Total ${type === 'quote' ? 'cotizado' : 'a pagar'}</span>
-              <span style="font-size:19px;font-weight:800;line-height:1">${fmt(total)}</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 4px 4px;margin-top:8px;border-top:2px solid ${accent}">
+              <span style="font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1;color:#0f172a">Total ${type === 'quote' ? 'cotizado' : 'a pagar'}</span>
+              <span style="font-size:20px;font-weight:800;line-height:1;color:${accent}">${fmt(total)}</span>
             </div>
           </div>
         </div>
