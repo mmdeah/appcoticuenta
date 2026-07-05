@@ -2,7 +2,7 @@
 import { requireAuth }  from '../../lib/auth.js';
 import { supabase }     from '../../lib/supabase.js';
 import { toast }        from '../../components/toast.js';
-import { renderSidebar, initSidebarEvents, renderTopBar } from '../../components/sidebar.js';
+import { renderSidebar, initSidebarEvents, renderTopBar, refreshButton } from '../../components/sidebar.js';
 
 export async function renderAdminRequests() {
   const auth = await requireAuth('admin');
@@ -30,7 +30,7 @@ export async function renderAdminRequests() {
     <div class="app-layout">
       ${renderSidebar('admin', auth.profile)}
       <div class="main-content">
-        ${renderTopBar('Solicitudes Pendientes')}
+        ${renderTopBar('Solicitudes Pendientes', refreshButton())}
         <div class="page-content">
           <div class="card" style="padding:0">
             <div class="table-wrap">
@@ -46,6 +46,8 @@ export async function renderAdminRequests() {
   `;
 
   initSidebarEvents();
+
+  document.getElementById('btn-refresh')?.addEventListener('click', () => renderAdminRequests());
 
   document.querySelectorAll('.approve-btn').forEach(btn => {
     btn.addEventListener('click', async () => {

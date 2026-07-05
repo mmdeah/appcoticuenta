@@ -1,7 +1,7 @@
 // src/pages/admin/tickets.js
 import { requireAuth }  from '../../lib/auth.js';
 import { supabase }     from '../../lib/supabase.js';
-import { renderSidebar, initSidebarEvents, renderTopBar } from '../../components/sidebar.js';
+import { renderSidebar, initSidebarEvents, renderTopBar, refreshButton } from '../../components/sidebar.js';
 
 export async function renderAdminTickets() {
   const auth = await requireAuth('admin');
@@ -29,7 +29,7 @@ export async function renderAdminTickets() {
     <div class="app-layout">
       ${renderSidebar('admin', auth.profile)}
       <div class="main-content">
-        ${renderTopBar('Tickets de Soporte')}
+        ${renderTopBar('Tickets de Soporte', refreshButton())}
         <div class="page-content">
           <div class="card" style="padding:0">
             <div class="table-wrap">
@@ -65,6 +65,8 @@ export async function renderAdminTickets() {
   `;
 
   initSidebarEvents();
+
+  document.getElementById('btn-refresh')?.addEventListener('click', () => renderAdminTickets());
 
   document.querySelectorAll('.ticket-row').forEach(row => {
     row.addEventListener('click', () => openTicket(row.dataset.id, adminId, tickets));

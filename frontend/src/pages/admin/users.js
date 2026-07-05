@@ -2,7 +2,7 @@
 import { requireAuth }  from '../../lib/auth.js';
 import { supabase }     from '../../lib/supabase.js';
 import { toast }        from '../../components/toast.js';
-import { renderSidebar, initSidebarEvents, renderTopBar } from '../../components/sidebar.js';
+import { renderSidebar, initSidebarEvents, renderTopBar, refreshButton } from '../../components/sidebar.js';
 
 export async function renderAdminUsers() {
   const auth = await requireAuth('admin');
@@ -37,7 +37,7 @@ export async function renderAdminUsers() {
     <div class="app-layout">
       ${renderSidebar('admin', auth.profile)}
       <div class="main-content">
-        ${renderTopBar('Usuarios Activos')}
+        ${renderTopBar('Usuarios Activos', refreshButton())}
         <div class="page-content">
           <div class="search-bar">
             <div class="search-input-wrap">
@@ -59,6 +59,8 @@ export async function renderAdminUsers() {
   `;
 
   initSidebarEvents();
+
+  document.getElementById('btn-refresh')?.addEventListener('click', () => renderAdminUsers());
 
   document.getElementById('u-search').addEventListener('input', e => {
     const q = e.target.value.toLowerCase();

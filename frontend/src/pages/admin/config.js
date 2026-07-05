@@ -2,7 +2,7 @@
 import { requireAuth }  from '../../lib/auth.js';
 import { supabase }     from '../../lib/supabase.js';
 import { toast }        from '../../components/toast.js';
-import { renderSidebar, initSidebarEvents, renderTopBar } from '../../components/sidebar.js';
+import { renderSidebar, initSidebarEvents, renderTopBar, refreshButton } from '../../components/sidebar.js';
 
 export async function renderAdminConfig() {
   const auth = await requireAuth('admin');
@@ -15,7 +15,7 @@ export async function renderAdminConfig() {
     <div class="app-layout">
       ${renderSidebar('admin', auth.profile)}
       <div class="main-content">
-        ${renderTopBar('Configuración del Sistema')}
+        ${renderTopBar('Configuración del Sistema', refreshButton())}
         <div class="page-content">
           <div class="card" style="max-width:600px">
             <h3 style="margin-bottom:16px">Datos para Pagos</h3>
@@ -46,6 +46,8 @@ export async function renderAdminConfig() {
   `;
 
   initSidebarEvents();
+
+  document.getElementById('btn-refresh')?.addEventListener('click', () => renderAdminConfig());
 
   document.getElementById('btn-save-config').addEventListener('click', async () => {
     const btn = document.getElementById('btn-save-config');

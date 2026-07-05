@@ -2,7 +2,7 @@
 import { requireAuth }  from '../../lib/auth.js';
 import { navigate }     from '../../lib/router.js';
 import { supabase }     from '../../lib/supabase.js';
-import { renderSidebar, initSidebarEvents, renderTopBar } from '../../components/sidebar.js';
+import { renderSidebar, initSidebarEvents, renderTopBar, refreshButton } from '../../components/sidebar.js';
 
 export async function renderAdminDashboard() {
   const auth = await requireAuth('admin');
@@ -54,7 +54,7 @@ export async function renderAdminDashboard() {
     <div class="app-layout">
       ${renderSidebar('admin', profile)}
       <div class="main-content">
-        ${renderTopBar('Panel de Administración')}
+        ${renderTopBar('Panel de Administración', refreshButton())}
         <div class="page-content">
 
           <div class="kpi-grid">
@@ -89,6 +89,8 @@ export async function renderAdminDashboard() {
   `;
 
   initSidebarEvents();
+
+  document.getElementById('btn-refresh')?.addEventListener('click', () => renderAdminDashboard());
 
   // Botones aprobar
   document.querySelectorAll('.approve-btn').forEach(btn => {

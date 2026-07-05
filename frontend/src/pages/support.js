@@ -22,7 +22,7 @@ export async function renderSupport() {
       </td>
       <td style="color:var(--c-text-2)">${new Date(t.created_at).toLocaleDateString('es-CO')}</td>
     </tr>
-  `).join('') || `<tr><td colspan="3"><div class="empty-state" style="padding:20px">No tienes tickets de soporte.</div></td></tr>`;
+  `).join('') || `<tr><td colspan="3"><div class="empty-state" style="padding:20px">Aún no has creado ningún ticket. Si tienes dudas, revisa las preguntas frecuentes arriba o crea uno nuevo.</div></td></tr>`;
 
   document.getElementById('app').innerHTML = `
     <div class="app-layout">
@@ -30,8 +30,42 @@ export async function renderSupport() {
       <div class="main-content">
         ${renderTopBar('Centro de Soporte', `<button class="btn btn-primary" id="btn-new-ticket">Nuevo Ticket</button>`)}
         <div class="page-content">
-          <p class="guide-text">Crea un ticket si tienes dudas o problemas. Nuestro equipo te responderá lo antes posible.</p>
+          <p class="guide-text">Antes de crear un ticket, revisa si tu pregunta ya tiene respuesta abajo. Si no la encuentras, escríbenos y normalmente respondemos en menos de 24 horas.</p>
+
+          <div class="card">
+            <h3 style="margin-bottom:4px">Preguntas frecuentes</h3>
+            <p class="form-hint" style="opacity:.7;margin-bottom:14px">Haz clic sobre una pregunta para ver la respuesta.</p>
+            <details class="faq-item">
+              <summary>¿Cómo creo una cotización o una cuenta de cobro?</summary>
+              <p>Ve al menú lateral y elige "Nueva Cotización" o "Nueva Cuenta de Cobro". Selecciona el cliente (o "Consumidor final"), agrega tus ítems y guarda o genera el PDF directamente, sin necesidad de guardarlo primero.</p>
+            </details>
+            <details class="faq-item">
+              <summary>¿Qué es "Consumidor final" en el selector de clientes?</summary>
+              <p>Úsalo cuando el documento no es para un cliente específico registrado en tu lista de Clientes. No necesitas crear un cliente nuevo para usarlo.</p>
+            </details>
+            <details class="faq-item">
+              <summary>¿Cómo cambio el logo o los colores de mis documentos?</summary>
+              <p>Ve a Configuración → pestaña "Empresa e Identidad". Ahí puedes subir el logo (una foto) y elegir tus colores principales.</p>
+            </details>
+            <details class="faq-item">
+              <summary>¿Puedo eliminar una cotización o cuenta de cobro?</summary>
+              <p>Sí. Ve a Historial y usa el botón "Eliminar" en la fila del documento que quieras borrar. Esta acción no se puede deshacer.</p>
+            </details>
+            <details class="faq-item">
+              <summary>¿Cuánto tarda la aprobación de mi cuenta o pago?</summary>
+              <p>Normalmente menos de 24 horas después de enviar tu comprobante de pago por WhatsApp. Mientras tanto no podrás iniciar sesión.</p>
+            </details>
+            <details class="faq-item">
+              <summary>¿Dónde veo mis ingresos y gastos?</summary>
+              <p>Ve a "Estadísticas y Gastos" en el menú lateral: ahí puedes ver un resumen de tu negocio y registrar tus gastos.</p>
+            </details>
+          </div>
+
           <div class="card" style="padding:0">
+            <div class="card-header" style="padding:16px 20px 0">
+              <h3 class="card-title">Mis tickets</h3>
+            </div>
+            <p class="guide-text" style="padding:0 20px">Aquí verás el historial de tus conversaciones con nuestro equipo de soporte.</p>
             <div class="table-wrap">
               <table class="table table-hover">
                 <thead><tr><th>Asunto</th><th>Estado</th><th>Fecha</th></tr></thead>
@@ -48,8 +82,9 @@ export async function renderSupport() {
       <div class="modal">
         <div class="modal-header"><h3 class="modal-title">Crear Ticket</h3><button class="modal-close" id="tm-close">×</button></div>
         <div class="modal-body">
-          <div class="form-group"><label class="form-label">Asunto</label><input id="tm-sub" class="form-control" /></div>
-          <div class="form-group"><label class="form-label">Mensaje</label><textarea id="tm-msg" class="form-control" style="min-height:120px"></textarea></div>
+          <p class="form-hint" style="opacity:.7;margin-top:0">Cuéntanos claramente qué necesitas para poder ayudarte más rápido.</p>
+          <div class="form-group"><label class="form-label">Asunto</label><input id="tm-sub" class="form-control" placeholder="Ej: No puedo subir mi logo" /></div>
+          <div class="form-group"><label class="form-label">Mensaje</label><textarea id="tm-msg" class="form-control" style="min-height:120px" placeholder="Describe el problema o tu pregunta con el mayor detalle posible..."></textarea></div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline" id="tm-cancel">Cancelar</button>

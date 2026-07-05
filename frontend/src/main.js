@@ -15,6 +15,7 @@ import { renderInvoiceNew }  from './pages/invoices-new.js';
 import { renderHistory }     from './pages/history.js';
 import { renderSettings }    from './pages/settings.js';
 import { renderSupport }     from './pages/support.js';
+import { renderStats }       from './pages/stats.js';
 import { renderWizard }      from './pages/wizard.js';
 
 // Pages - Admin
@@ -37,6 +38,7 @@ route('/clients',      renderClients);
 route('/quotes/new',   renderQuoteNew);
 route('/invoices/new', renderInvoiceNew);
 route('/history',      renderHistory);
+route('/stats',        renderStats);
 route('/settings',     renderSettings);
 route('/support',      renderSupport);
 

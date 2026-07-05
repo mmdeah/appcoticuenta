@@ -15,6 +15,7 @@ const icon = {
   users:    `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>`,
   requests: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>`,
   config:   `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+  stats:    `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>`,
 };
 
 const LOGO_SVG = `
@@ -35,6 +36,7 @@ export function renderSidebar(role = 'client', profile = {}) {
     <a class="sidebar-link" data-route="/history">${icon.history}Historial</a>
     <div class="sidebar-section">Gestión</div>
     <a class="sidebar-link" data-route="/clients">${icon.clients}Clientes</a>
+    <a class="sidebar-link" data-route="/stats">${icon.stats}Estadísticas y Gastos</a>
     <a class="sidebar-link" data-route="/settings">${icon.settings}Configuración</a>
     <div class="sidebar-section">Soporte</div>
     <a class="sidebar-link" data-route="/support">${icon.support}Centro de Soporte</a>
@@ -112,6 +114,15 @@ function openMobileSidebar() {
 function closeMobileSidebar() {
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebar-overlay')?.classList.remove('visible');
+}
+
+export function refreshButton() {
+  return `
+    <button class="btn btn-outline btn-sm" id="btn-refresh" title="Recargar toda la información desde la base de datos">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      Actualizar
+    </button>
+  `;
 }
 
 export function renderTopBar(title, extra = '') {
