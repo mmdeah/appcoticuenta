@@ -14,14 +14,16 @@ export async function renderAdminUsers() {
     .order('name');
 
   const rows = (users || []).map(u => {
+    const isSelf = u.id === auth.profile.id;
     const badge = u.status === 'active' ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Suspendido</span>';
     return `
       <tr>
         <td><strong>${u.companies?.name || '—'}</strong><div style="font-size:11px;color:var(--c-text-3)">NIT: ${u.companies?.nit||''}</div></td>
-        <td>${u.name}</td>
+        <td>${u.name}${isSelf ? ' <span class="badge badge-gray">Tú</span>' : ''}</td>
         <td>${u.email}</td>
         <td>${badge}</td>
         <td>
+          ${isSelf ? '<span class="form-hint" style="opacity:.7">No puedes modificar tu propia cuenta desde aquí</span>' : `
           <div class="table-actions">
             <button class="btn btn-outline btn-sm toggle-status" data-id="${u.id}" data-status="${u.status}">
               ${u.status === 'active' ? 'Suspender' : 'Activar'}
@@ -29,6 +31,7 @@ export async function renderAdminUsers() {
             ${u.status === 'suspended' ? `<button class="btn btn-outline btn-sm archive-btn" data-id="${u.id}" style="color:var(--c-text-3)">Archivar</button>` : ''}
             <button class="btn btn-danger btn-sm delete-user-btn" data-id="${u.id}">Eliminar</button>
           </div>
+          `}
         </td>
       </tr>
     `;
@@ -70,11 +73,14 @@ export async function renderAdminUsers() {
     });
   });
 
+  const currentAdminId = auth.profile.id;
+
   document.querySelectorAll('.toggle-status').forEach(btn => {
     btn.addEventListener('click', async () => {
+      if (btn.dataset.id === currentAdminId) { toast('No puedes suspender tu propia cuenta.', 'error'); return; }
       const newStatus = btn.dataset.status === 'active' ? 'suspended' : 'active';
       if(!confirm(`¿Seguro que deseas ${newStatus==='active'?'activar':'suspender'} este usuario?`)) return;
-      
+
       btn.disabled = true;
       await supabase.from('users').update({ status: newStatus }).eq('id', btn.dataset.id);
       toast('Estado actualizado', 'success');
@@ -84,6 +90,7 @@ export async function renderAdminUsers() {
 
   document.querySelectorAll('.archive-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
+      if (btn.dataset.id === currentAdminId) { toast('No puedes archivar tu propia cuenta.', 'error'); return; }
       if(!confirm('¿Seguro que deseas archivar este usuario permanentemente? No aparecerá en esta lista.')) return;
       btn.disabled = true;
       await supabase.from('users').update({ status: 'archived' }).eq('id', btn.dataset.id);
@@ -94,6 +101,7 @@ export async function renderAdminUsers() {
 
   document.querySelectorAll('.delete-user-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
+      if (btn.dataset.id === currentAdminId) { toast('No puedes eliminar tu propia cuenta de administrador.', 'error'); return; }
       if(!confirm('¿Eliminar este usuario permanentemente de la aplicación? Esta acción no se puede deshacer.')) return;
       btn.disabled = true;
       const { error } = await supabase.from('users').delete().eq('id', btn.dataset.id);
