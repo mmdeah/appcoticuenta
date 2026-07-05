@@ -71,8 +71,8 @@ export async function renderStats() {
 
   const expenseRows = (expenses || []).map(e => `
     <tr>
-      <td>${e.date ? new Date(e.date).toLocaleDateString('es-CO') : '—'}</td>
-      <td>${e.description || '—'}</td>
+      <td style="white-space:nowrap">${e.date ? new Date(e.date).toLocaleDateString('es-CO') : '—'}</td>
+      <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.description || '—'}</td>
       <td><span class="badge badge-gray">${e.category || 'Otros'}</span></td>
       <td style="font-weight:600">${fmt(e.amount)}</td>
       <td>
