@@ -1,5 +1,5 @@
 // src/pages/admin/dashboard.js
-import { requireAuth }  from '../../lib/auth.js';
+import { requireAuth, getDaysRemaining } from '../../lib/auth.js';
 import { navigate }     from '../../lib/router.js';
 import { supabase }     from '../../lib/supabase.js';
 import { renderSidebar, initSidebarEvents, renderTopBar, refreshButton } from '../../components/sidebar.js';
@@ -17,7 +17,7 @@ export async function renderAdminDashboard() {
   const [
     { count: activeUsers },
     { count: pendingReqs },
-    { count: nearExpiry  },
+    { data: nearExpiryList },
     { count: expired     },
     { count: openTickets },
     { data: recentReqs   },
@@ -25,7 +25,7 @@ export async function renderAdminDashboard() {
   ] = await Promise.all([
     supabase.from('users').select('*', { count:'exact', head:true }).eq('status','active'),
     supabase.from('users').select('*', { count:'exact', head:true }).eq('status','pending'),
-    supabase.from('payments').select('*', { count:'exact', head:true }).gte('expiry_date', today).lte('expiry_date', in7).eq('status','active'),
+    supabase.from('payments').select('*, companies(name)').gte('expiry_date', today).lte('expiry_date', in7).eq('status','active').order('expiry_date', { ascending: true }),
     supabase.from('payments').select('*', { count:'exact', head:true }).lt('expiry_date', today).eq('status','active'),
     supabase.from('tickets').select('*', { count:'exact', head:true }).eq('status','open'),
     supabase.from('users').select('*, companies(*)').eq('status','pending').order('request_date', { ascending:false }).limit(5),
@@ -33,6 +33,18 @@ export async function renderAdminDashboard() {
   ]);
 
   const monthRevenue = (monthPayments || []).reduce((s, p) => s + (p.amount || 0), 0);
+  const nearExpiry = (nearExpiryList || []).length;
+
+  const expiryRows = (nearExpiryList || []).map(p => {
+    const daysLeft = getDaysRemaining(p.expiry_date);
+    return `
+      <tr>
+        <td><strong>${p.companies?.name || '—'}</strong></td>
+        <td>${p.expiry_date ? new Date(p.expiry_date).toLocaleDateString('es-CO') : '—'}</td>
+        <td><span class="badge ${daysLeft <= 3 ? 'badge-danger' : 'badge-warning'}">${daysLeft} día(s)</span></td>
+      </tr>
+    `;
+  }).join('') || `<tr><td colspan="3"><div class="empty-state" style="padding:20px">Ninguna empresa está por vencer en los próximos 7 días.</div></td></tr>`;
 
   const reqRows = (recentReqs || []).map(u => `
     <tr>
@@ -80,6 +92,18 @@ export async function renderAdminDashboard() {
                   </tr>
                 </thead>
                 <tbody id="req-tbody">${reqRows}</tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Empresas por vencer (próximos 7 días)</h3>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead><tr><th>Empresa</th><th>Vence</th><th>Días restantes</th></tr></thead>
+                <tbody>${expiryRows}</tbody>
               </table>
             </div>
           </div>
