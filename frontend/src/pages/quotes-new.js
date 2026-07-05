@@ -58,11 +58,13 @@ export async function renderQuoteNew(params) {
               <div class="card" style="padding:16px">
                 <h4 style="margin-bottom:4px;font-size:14px">Ítems</h4>
                 <p class="form-hint" style="opacity:.7;margin-bottom:12px">El valor unitario se formatea automáticamente en pesos colombianos (COP).</p>
-                <div class="items-table" style="margin-bottom:12px">
-                  <div class="item-row item-row-header">
-                    <div>Descripción</div><div>Cant.</div><div>Valor Unit.</div><div>Total</div><div></div>
+                <div class="items-table-wrap" style="margin-bottom:12px">
+                  <div class="items-table">
+                    <div class="item-row item-row-header">
+                      <div>Descripción</div><div>Cant.</div><div>Valor Unit.</div><div>Total</div><div></div>
+                    </div>
+                    <div id="items-container"></div>
                   </div>
-                  <div id="items-container"></div>
                 </div>
                 <button class="btn btn-outline btn-sm" id="btn-add-item">+ Agregar ítem</button>
               </div>
@@ -241,6 +243,7 @@ export async function renderQuoteNew(params) {
         issueDate: document.getElementById('q-date').value,
         company,
         client: getSelectedClient(cidRaw),
+        user: { name: profile.name, phone: profile.phone, email: profile.email },
         items,
         subtotal: sub,
         tax: iva,

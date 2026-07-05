@@ -69,6 +69,7 @@ export async function renderHistory() {
           issueDate: doc.issue_date,
           company: doc.companies,
           client: doc.clients,
+          user: { name: profile.name, phone: profile.phone, email: profile.email },
           items: doc.items || [],
           subtotal: doc.subtotal,
           tax: doc.tax_total,

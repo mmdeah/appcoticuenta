@@ -53,7 +53,7 @@
 
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
   font-family: var(--font);
   background: var(--c-bg);
@@ -61,6 +61,8 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  width: 100%;
 }
 a { color: var(--c-accent); text-decoration: none; }
 a:hover { color: var(--c-accent-hover); }
@@ -583,7 +585,8 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   justify-content: space-between;
 }
 .preview-body { padding: 16px; }
-.items-table { border: 1px solid var(--c-border); border-radius: var(--radius); overflow: hidden; }
+.items-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); }
+.items-table { border: 1px solid var(--c-border); border-radius: var(--radius); overflow: hidden; min-width: 480px; }
 .item-row {
   display: grid;
   grid-template-columns: 1fr 80px 100px 90px 36px;
