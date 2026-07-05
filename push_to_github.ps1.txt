@@ -1,0 +1,46 @@
+# --------------------------------------------------------------
+# push_to_github.ps1
+# Script rápido para inicializar, commitear y subir el proyecto a GitHub
+# --------------------------------------------------------------
+
+# 1️⃣  Ruta del proyecto (cámbiala si tu carpeta está en otro sitio)
+$projectRoot = "C:\Users\MUNDIAL DEL PC\Desktop\appcoticuenta"
+
+# 2️⃣  URL del repositorio remoto (HTTPS) → REEMPLAZA con tu URL real
+#    Ejemplo: https://github.com/tu-usuario/tu-repo.git
+$remoteUrl = "https://github.com/TU_USUARIO/TU_REPO.git"
+
+# 3️⃣  Cambiar al directorio del proyecto
+Set-Location $projectRoot
+
+# 4️⃣  Inicializar git (solo la primera vez)
+if (-Not (Test-Path ".git")) {
+    Write-Host "Inicializando repositorio git..." -ForegroundColor Cyan
+    git init
+}
+
+# 5️⃣  Configurar el remote (sobrescribe si ya existía)
+git remote remove origin 2>$null   # elimina remote viejo si existe
+git remote add origin $remoteUrl
+
+# 6️⃣  Añadir todos los archivos (excepto los listados en .gitignore)
+Write-Host "Añadiendo cambios al staging..." -ForegroundColor Cyan
+git add .
+
+# 7️⃣  Crear commit (usa la fecha/hora como mensaje por defecto)
+$commitMsg = "🚀 Deploy inicial – $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+git commit -m $commitMsg
+
+# 8️⃣  Empujar a la rama principal (master o main)
+#    Detecta la rama actual; si no existe, crea 'main' y la empuja.
+$currentBranch = (git rev-parse --abbrev-ref HEAD).Trim()
+if ($currentBranch -eq "HEAD") {
+    # repositorio vacío → crear rama main
+    git checkout -b main
+    $currentBranch = "main"
+}
+
+Write-Host "Empujando a GitHub (rama $currentBranch)..." -ForegroundColor Cyan
+git push -u origin $currentBranch --force
+
+Write-Host "`n✅  ¡Todo listo! Revisa tu repositorio en GitHub." -ForegroundColor Green
