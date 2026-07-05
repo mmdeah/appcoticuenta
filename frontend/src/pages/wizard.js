@@ -29,7 +29,7 @@ export async function renderWizard() {
           Antes de continuar debes completar la configuración inicial de tu empresa.
         </p>
         <p class="guide-text" style="text-align:center">
-          Te guiaremos paso a paso. No podrás usar el resto de la plataforma hasta terminar estos 4 pasos.
+          Tranquilo, no necesitas experiencia previa: te explicamos para qué sirve cada campo. Son solo 4 pasos cortos y no podrás usar el resto de la plataforma hasta terminarlos.
         </p>
 
         <div class="wizard-steps">
@@ -48,20 +48,33 @@ export async function renderWizard() {
         </div>
 
         <div id="step-1" class="wizard-content">
-          <p class="guide-text">Estos datos aparecerán en el encabezado de tus cotizaciones y cuentas de cobro.</p>
-          <div class="form-group"><label class="form-label">Dirección <span>*</span></label><input id="w-address" class="form-control" placeholder="Av. Principal #123" /></div>
+          <p class="guide-text">Estos datos aparecen en el encabezado de cada cotización y cuenta de cobro que generes, para que tu cliente identifique quién le está facturando.</p>
+          <div class="form-group">
+            <label class="form-label">Dirección <span>*</span></label>
+            <input id="w-address" class="form-control" placeholder="Av. Principal #123" />
+            <p class="form-hint" style="opacity:.7">La dirección física o de correspondencia de tu negocio. Aparecerá debajo del nombre de tu empresa en los documentos.</p>
+          </div>
           <div class="form-row cols-2">
-            <div class="form-group"><label class="form-label">Ciudad <span>*</span></label><input id="w-city" class="form-control" placeholder="Bogotá" /></div>
-            <div class="form-group"><label class="form-label">Sitio web</label><input id="w-website" class="form-control" placeholder="www.miempresa.com" /></div>
+            <div class="form-group">
+              <label class="form-label">Ciudad <span>*</span></label>
+              <input id="w-city" class="form-control" placeholder="Bogotá" />
+              <p class="form-hint" style="opacity:.7">La ciudad donde opera tu empresa.</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sitio web</label>
+              <input id="w-website" class="form-control" placeholder="www.miempresa.com" />
+              <p class="form-hint" style="opacity:.7">Opcional. Si no tienes página web, deja este campo vacío.</p>
+            </div>
           </div>
         </div>
 
         <div id="step-2" class="wizard-content" style="display:none">
-          <p class="guide-text">Personaliza la identidad visual de tus documentos con tu logo y tus colores de marca.</p>
+          <p class="guide-text">Esto es solo para que tus documentos se vean profesionales y con tu marca. Si no tienes logo o colores definidos, puedes saltarte este paso y dejarlo como está por ahora.</p>
           <div class="form-group">
             <label class="form-label">Logotipo <span style="font-size:12px;font-weight:400;color:var(--c-text-3)">(Opcional)</span></label>
             <input type="file" id="w-logo-file" class="form-control" accept="image/*" />
             <img id="w-logo-preview" style="max-height:80px; margin-top:10px; display:none" />
+            <p class="form-hint" style="opacity:.7">Sube una foto o imagen de tu logo (JPG o PNG). Se mostrará en la parte superior de tus cotizaciones y cuentas de cobro.</p>
           </div>
           <div class="form-row cols-2">
             <div class="form-group">
@@ -70,6 +83,7 @@ export async function renderWizard() {
                 <input type="color" id="w-color1" value="#1e293b" style="padding:0;width:40px;height:40px;border:none;border-radius:4px" />
                 <span id="w-color1-val" style="font-family:monospace;font-size:13px">#1e293b</span>
               </div>
+              <p class="form-hint" style="opacity:.7">El color principal de tu marca. Se usa en los títulos y detalles de tus documentos.</p>
             </div>
             <div class="form-group">
               <label class="form-label">Color secundario</label>
@@ -77,31 +91,50 @@ export async function renderWizard() {
                 <input type="color" id="w-color2" value="#3b82f6" style="padding:0;width:40px;height:40px;border:none;border-radius:4px" />
                 <span id="w-color2-val" style="font-family:monospace;font-size:13px">#3b82f6</span>
               </div>
+              <p class="form-hint" style="opacity:.7">Un color de apoyo, usado en detalles menores. Si no sabes cuál elegir, deja el que viene por defecto.</p>
             </div>
           </div>
         </div>
 
         <div id="step-3" class="wizard-content" style="display:none">
-          <p class="guide-text">Estos textos se incluirán por defecto en tus documentos (podrás editarlos en cada uno).</p>
-          <div class="form-group"><label class="form-label">Condiciones comerciales</label><textarea id="w-terms" class="form-control" placeholder="Términos y condiciones..."></textarea></div>
-          <div class="form-group"><label class="form-label">Garantía</label><textarea id="w-warranty" class="form-control" placeholder="Detalles de la garantía..."></textarea></div>
+          <p class="guide-text">Ya dejamos un texto genérico para que no tengas que empezar de cero. Puedes usarlo tal cual, editarlo a tu gusto, o incluso cambiarlo cada vez que hagas una cotización o cuenta de cobro.</p>
+          <div class="form-group">
+            <label class="form-label">Condiciones comerciales</label>
+            <textarea id="w-terms" class="form-control">Los precios incluidos en este documento pueden estar sujetos a cambios sin previo aviso. Cualquier trabajo, producto o servicio adicional no contemplado aquí será cotizado por separado. El cliente se compromete a suministrar la información y los recursos necesarios para la correcta prestación del servicio.</textarea>
+            <p class="form-hint" style="opacity:.7">Son las reglas del juego con tu cliente: qué incluye el precio, qué pasa si piden cambios, etc. Aparecerá al final de tus documentos.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Garantía</label>
+            <textarea id="w-warranty" class="form-control">Este producto o servicio cuenta con una garantía de 30 días a partir de la fecha de entrega, la cual cubre defectos de fabricación o instalación. No cubre daños ocasionados por mal uso.</textarea>
+            <p class="form-hint" style="opacity:.7">Cuánto tiempo respondes si algo sale mal después de entregar tu producto o servicio. Por defecto dejamos 30 días, puedes cambiarlo.</p>
+          </div>
         </div>
 
         <div id="step-4" class="wizard-content" style="display:none">
-          <p class="guide-text">Define si aplicas IVA por defecto y desde qué número empiezan tus consecutivos.</p>
+          <p class="guide-text">Estas opciones controlan cómo se calculan y numeran automáticamente tus documentos. Si no estás seguro, puedes dejarlas como están y ajustarlas después en Configuración.</p>
           <div class="form-group" style="margin-bottom:24px">
             <div class="toggle-group" style="margin-bottom:12px">
               <label class="toggle"><input type="checkbox" id="w-iva-btn" /><span class="toggle-slider"></span></label>
               <span class="toggle-label">Aplicar IVA por defecto</span>
             </div>
+            <p class="form-hint" style="opacity:.7;margin-top:-8px;margin-bottom:8px">El IVA es el impuesto sobre las ventas en Colombia. Actívalo si tu empresa debe cobrarlo; si no aplica en tu caso, déjalo apagado.</p>
             <div id="w-iva-box" style="display:none">
               <label class="form-label">Porcentaje de IVA (%)</label>
               <input type="number" id="w-iva-val" class="form-control" value="19" style="max-width:150px" />
+              <p class="form-hint" style="opacity:.7">La tarifa general en Colombia es 19%. Cámbiala solo si tu caso es diferente.</p>
             </div>
           </div>
           <div class="form-row cols-2">
-            <div class="form-group"><label class="form-label">Siguiente número de Cotización</label><input type="number" id="w-num-q" class="form-control" value="1" /></div>
-            <div class="form-group"><label class="form-label">Siguiente número de Factura</label><input type="number" id="w-num-i" class="form-control" value="1" /></div>
+            <div class="form-group">
+              <label class="form-label">Siguiente número de Cotización</label>
+              <input type="number" id="w-num-q" class="form-control" value="1" />
+              <p class="form-hint" style="opacity:.7">El número con el que empezará tu primera cotización (ej: COT-0001). Luego sube automáticamente con cada una que crees.</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Siguiente número de Factura</label>
+              <input type="number" id="w-num-i" class="form-control" value="1" />
+              <p class="form-hint" style="opacity:.7">El número con el que empezará tu primera cuenta de cobro (ej: CC-0001). También sube automáticamente.</p>
+            </div>
           </div>
         </div>
 

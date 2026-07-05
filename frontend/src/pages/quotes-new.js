@@ -3,6 +3,7 @@ import { requireAuth }  from '../lib/auth.js';
 import { navigate }     from '../lib/router.js';
 import { supabase }     from '../lib/supabase.js';
 import { toast }        from '../components/toast.js';
+import { downloadDocumentPDF } from '../lib/pdf.js';
 import { renderSidebar, initSidebarEvents, renderTopBar } from '../components/sidebar.js';
 
 export async function renderQuoteNew(params) {
@@ -213,8 +214,47 @@ export async function renderQuoteNew(params) {
     }
   });
 
-  // PDF Helper
-  document.getElementById('btn-pdf').addEventListener('click', () => {
-    toast('Guarda la cotización primero para generar el PDF.','warning');
+  // Obtiene los datos del cliente seleccionado sin necesidad de guardarlo
+  function getSelectedClient(cidRaw) {
+    if (cidRaw === '__final__') return { name: 'Consumidor Final' };
+    return (clients || []).find(c => c.id === cidRaw) || null;
+  }
+
+  // Generar PDF (no requiere guardar la cotización primero)
+  document.getElementById('btn-pdf').addEventListener('click', async () => {
+    const cidRaw = document.getElementById('q-client').value;
+    if (!cidRaw) { toast('Selecciona un cliente', 'error'); return; }
+    if (items.some(x => !x.desc)) { toast('Completa la descripción de los ítems', 'error'); return; }
+
+    const btn = document.getElementById('btn-pdf');
+    btn.disabled = true; btn.textContent = 'Generando PDF...';
+
+    try {
+      const sub = items.reduce((acc, it) => acc + (it.qty * it.price), 0);
+      const ivaPct = conf.iva_enabled ? (conf.iva_percent || 0) : 0;
+      const iva = sub * (ivaPct / 100);
+      const total = sub + iva;
+
+      await downloadDocumentPDF({
+        type: 'quote',
+        number: qNum,
+        issueDate: document.getElementById('q-date').value,
+        company,
+        client: getSelectedClient(cidRaw),
+        items,
+        subtotal: sub,
+        tax: iva,
+        taxPercent: conf.iva_enabled ? ivaPct : 0,
+        total,
+        terms: document.getElementById('q-terms').value,
+        warranty: document.getElementById('q-warr').value,
+        paymentMode: document.getElementById('q-pay').value,
+        validity: document.getElementById('q-val').value,
+      });
+    } catch (err) {
+      console.error(err);
+      toast('Error al generar el PDF', 'error');
+    }
+    btn.disabled = false; btn.textContent = 'Generar PDF';
   });
 }

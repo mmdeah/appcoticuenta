@@ -3,6 +3,7 @@ import { requireAuth }  from '../lib/auth.js';
 import { navigate }     from '../lib/router.js';
 import { supabase }     from '../lib/supabase.js';
 import { toast }        from '../components/toast.js';
+import { downloadDocumentPDF } from '../lib/pdf.js';
 import { renderSidebar, initSidebarEvents, renderTopBar } from '../components/sidebar.js';
 
 export async function renderInvoiceNew() {
@@ -64,7 +65,7 @@ export async function renderInvoiceNew() {
 
               <div class="card">
                 <p class="form-hint" style="opacity:.7">Este texto aparecerá al final de la cuenta de cobro (datos de pago, instrucciones, etc.).</p>
-                <div class="form-group"><label class="form-label">Notas Adicionales</label><textarea id="i-terms" class="form-control" style="min-height:60px">Favor realizar el pago a la cuenta...</textarea></div>
+                <div class="form-group"><label class="form-label">Notas Adicionales</label><textarea id="i-terms" class="form-control" style="min-height:60px" placeholder="Ej: Datos de la cuenta para el pago, instrucciones adicionales..."></textarea></div>
               </div>
             </div>
 
@@ -196,7 +197,44 @@ export async function renderInvoiceNew() {
     }
   });
   
-  document.getElementById('btn-pdf').addEventListener('click', () => {
-    toast('Guarda el documento primero para generar el PDF.','warning');
+  // Obtiene los datos del cliente seleccionado sin necesidad de guardarlo
+  function getSelectedClient(cidRaw) {
+    if (cidRaw === '__final__') return { name: 'Consumidor Final' };
+    return (clients || []).find(c => c.id === cidRaw) || null;
+  }
+
+  // Generar PDF (no requiere guardar la cuenta de cobro primero)
+  document.getElementById('btn-pdf').addEventListener('click', async () => {
+    const cidRaw = document.getElementById('i-client').value;
+    if (!cidRaw) { toast('Selecciona un cliente', 'error'); return; }
+    if (items.some(x => !x.desc)) { toast('Completa la descripción de los ítems', 'error'); return; }
+
+    const btn = document.getElementById('btn-pdf');
+    btn.disabled = true; btn.textContent = 'Generando PDF...';
+
+    try {
+      const sub = items.reduce((acc, it) => acc + (it.qty * it.price), 0);
+      const ivaPct = conf.iva_enabled ? (conf.iva_percent || 0) : 0;
+      const iva = sub * (ivaPct / 100);
+      const total = sub + iva;
+
+      await downloadDocumentPDF({
+        type: 'invoice',
+        number: iNum,
+        issueDate: document.getElementById('i-date').value,
+        company,
+        client: getSelectedClient(cidRaw),
+        items,
+        subtotal: sub,
+        tax: iva,
+        taxPercent: conf.iva_enabled ? ivaPct : 0,
+        total,
+        notes: document.getElementById('i-terms').value,
+      });
+    } catch (err) {
+      console.error(err);
+      toast('Error al generar el PDF', 'error');
+    }
+    btn.disabled = false; btn.textContent = 'Generar PDF';
   });
 }
