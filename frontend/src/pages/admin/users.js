@@ -21,6 +21,7 @@ export async function renderAdminUsers() {
         <td><strong>${u.companies?.name || '—'}</strong><div style="font-size:11px;color:var(--c-text-3)">NIT: ${u.companies?.nit||''}</div></td>
         <td>${u.name}${isSelf ? ' <span class="badge badge-gray">Tú</span>' : ''}</td>
         <td>${u.email}</td>
+        <td>${u.phone || '—'}</td>
         <td>${badge}</td>
         <td>
           ${isSelf ? '<span class="form-hint" style="opacity:.7">No puedes modificar tu propia cuenta desde aquí</span>' : `
@@ -35,7 +36,7 @@ export async function renderAdminUsers() {
         </td>
       </tr>
     `;
-  }).join('') || `<tr><td colspan="5"><div class="empty-state">No hay usuarios registrados.</div></td></tr>`;
+  }).join('') || `<tr><td colspan="6"><div class="empty-state">No hay usuarios registrados.</div></td></tr>`;
 
   document.getElementById('app').innerHTML = `
     <div class="app-layout">
@@ -52,7 +53,7 @@ export async function renderAdminUsers() {
           <div class="card" style="padding:0">
             <div class="table-wrap">
               <table class="table" id="users-table">
-                <thead><tr><th>Empresa</th><th>Responsable</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>Empresa</th><th>Responsable</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody>${rows}</tbody>
               </table>
             </div>
